@@ -18,7 +18,6 @@ package org.onebusway.gtfs_realtime.exporter;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.inject.Inject;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,7 +39,6 @@ abstract class AbstractGtfsRealtimeServlet extends HttpServlet implements
 
   private URL _url;
 
-  @Inject
   public void setProvider(GtfsRealtimeProvider provider) {
     _provider = provider;
   }

@@ -15,6 +15,7 @@
  */
 package org.onebusway.gtfs_realtime.exporter;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.protobuf.Message;
@@ -23,6 +24,11 @@ import com.google.protobuf.Message;
 public class VehiclePositionsServlet extends AbstractGtfsRealtimeServlet {
 
   private static final long serialVersionUID = 1L;
+
+  @Inject
+  public void setProvider(GtfsRealtimeProvider provider) {
+    _provider = provider;
+  }
 
   @Override
   protected Message getMessage() {
