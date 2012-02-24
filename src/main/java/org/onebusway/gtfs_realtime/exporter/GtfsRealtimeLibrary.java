@@ -15,13 +15,31 @@
  */
 package org.onebusway.gtfs_realtime.exporter;
 
+import com.google.transit.realtime.GtfsRealtime.TranslatedString;
+import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtimeConstants;
 import com.google.transit.realtime.GtfsRealtime.FeedHeader;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.FeedHeader.Incrementality;
 
-public class GtfsRealtimeSupport {
+/**
+ * Provides a number of convenience methods for working with GTFS-realtime data.
+ * 
+ * @author bdferris
+ * 
+ */
+public class GtfsRealtimeLibrary {
 
+  /**
+   * Constructs a new {@link FeedMessage.Builder} that can be used to build a
+   * new GTFS-realtime feed message. The {@link FeedHeader} will already be
+   * filled in as a {@link Incrementality#FULL_DATASET} and the timestamp of the
+   * feed will be set to NOW. This is the minimal requirement for an empty feed
+   * so the feed could be returned 'as-is' at this point.
+   * 
+   * 
+   * @return a new feed message builder with a header already populated
+   */
   public static FeedMessage.Builder createFeedMessageBuilder() {
     long now = System.currentTimeMillis();
     FeedHeader.Builder header = FeedHeader.newBuilder();
@@ -31,5 +49,18 @@ public class GtfsRealtimeSupport {
     FeedMessage.Builder feedMessageBuilder = FeedMessage.newBuilder();
     feedMessageBuilder.setHeader(header);
     return feedMessageBuilder;
+  }
+
+  /**
+   * @param text the text to include in the translated string
+   * @return a new {@link TranslatedString} with just a single translation in
+   *         the default language of the feed using the specified text.
+   */
+  public static TranslatedString getTextAsTranslatedString(String text) {
+    TranslatedString.Builder builder = TranslatedString.newBuilder();
+    Translation.Builder translation = Translation.newBuilder();
+    translation.setText(text);
+    builder.addTranslation(translation);
+    return builder.build();
   }
 }

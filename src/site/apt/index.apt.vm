@@ -1,0 +1,4 @@
+onebusaway-gtfs-realtime-exporter
+
+  Project documentation for the `onebusaway-gtfs-realtime-exporter`, which provides a Java library for easily sharing
+GTFS-realtime data via an embedded web-server or by writing the data to file. 

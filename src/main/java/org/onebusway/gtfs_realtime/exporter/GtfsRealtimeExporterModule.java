@@ -15,15 +15,24 @@
  */
 package org.onebusway.gtfs_realtime.exporter;
 
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.onebusaway.guice.jetty_exporter.JettyExporterModule;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 public class GtfsRealtimeExporterModule extends AbstractModule {
 
   public static final String NAME_EXECUTOR = "org.onebusway.gtfs_realtime.exporter.GtfsRealtimeExporterModule.executor";
+  
+  public static void addModuleAndDependencies(Set<Module> modules) {
+    modules.add(new GtfsRealtimeExporterModule());
+    JettyExporterModule.addModuleAndDependencies(modules);
+  }
 
   @Override
   protected void configure() {
@@ -36,5 +45,23 @@ public class GtfsRealtimeExporterModule extends AbstractModule {
     bind(ScheduledExecutorService.class).annotatedWith(
         Names.named(NAME_EXECUTOR)).toInstance(
         Executors.newSingleThreadScheduledExecutor());
+  }
+
+  /**
+   * Implement hashCode() and equals() such that two instances of the module
+   * will be equal.
+   */
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null)
+      return false;
+    return this.getClass().equals(o.getClass());
   }
 }

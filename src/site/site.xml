@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="onebusaway-gtfs-realtime-exporter">
+  <body>
+    <menu name="Introduction">
+      <item name="About" href="/index.html" />      
+      <item name="Release Notes" href="/release-notes.html" />
+      <item name="API Javadoc" href="/apidocs/index.html" />
+    </menu>
+    <menu ref="reports" />
+  </body>
+</project>
