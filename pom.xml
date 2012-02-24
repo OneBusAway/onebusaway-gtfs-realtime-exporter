@@ -13,7 +13,7 @@
   <url>https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/wiki/</url>
 
   <properties>
-    <gtfs_realtime_api_version>1.0.1-SNAPSHOT</gtfs_realtime_api_version>
+    <gtfs_realtime_api_version>1.0.2</gtfs_realtime_api_version>
   </properties>
 
   <repositories>
