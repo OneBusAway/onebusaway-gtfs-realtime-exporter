@@ -43,7 +43,7 @@ public class GtfsRealtimeLibrary {
   public static FeedMessage.Builder createFeedMessageBuilder() {
     long now = System.currentTimeMillis();
     FeedHeader.Builder header = FeedHeader.newBuilder();
-    header.setTimestamp(now);
+    header.setTimestamp(now / 1000);
     header.setIncrementality(Incrementality.FULL_DATASET);
     header.setGtfsRealtimeVersion(GtfsRealtimeConstants.VERSION);
     FeedMessage.Builder feedMessageBuilder = FeedMessage.newBuilder();
