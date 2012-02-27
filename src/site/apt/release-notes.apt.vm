@@ -2,9 +2,13 @@ Release Notes
 
 * ${currentVersion}
 
+  * Full Documentation: {{${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/${currentVersion}/}}
+
+* 1.0.1
+
   * Fix a bug with the timestamp value in the GTFS-realtime FeedHeader.
 
-  * Full Documentation: {{${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/${currentVersion}/}}
+  * Full Documentation: {{${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/1.0.1/}}
   
 * 1.0.0
 
