@@ -28,7 +28,7 @@ import com.google.inject.name.Names;
 public class GtfsRealtimeExporterModule extends AbstractModule {
 
   public static final String NAME_EXECUTOR = "org.onebusway.gtfs_realtime.exporter.GtfsRealtimeExporterModule.executor";
-  
+
   public static void addModuleAndDependencies(Set<Module> modules) {
     modules.add(new GtfsRealtimeExporterModule());
     JettyExporterModule.addModuleAndDependencies(modules);
@@ -36,6 +36,8 @@ public class GtfsRealtimeExporterModule extends AbstractModule {
 
   @Override
   protected void configure() {
+    bind(GtfsRealtimeProvider.class).to(GtfsRealtimeProviderImpl.class);
+    bind(GtfsRealtimeMutableProvider.class).to(GtfsRealtimeProviderImpl.class);
     bind(AlertsFileWriter.class);
     bind(TripUpdatesFileWriter.class);
     bind(VehiclePositionsFileWriter.class);

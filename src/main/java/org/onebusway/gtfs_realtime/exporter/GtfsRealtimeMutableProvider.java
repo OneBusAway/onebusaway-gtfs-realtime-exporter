@@ -17,15 +17,21 @@ package org.onebusway.gtfs_realtime.exporter;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-public interface GtfsRealtimeProvider {
-  
-  public FeedMessage getTripUpdates();
+public interface GtfsRealtimeMutableProvider extends GtfsRealtimeProvider {
 
-  public FeedMessage getVehiclePositions();
+  public void setTripUpdates(FeedMessage tripUpdates);
 
-  public FeedMessage getAlerts();
-  
-  public void addGtfsRealtimeListener(GtfsRealtimeListener listener);
-  
-  public void removeGtfsRealtimeListener(GtfsRealtimeListener listener);
+  public void setTripUpdates(FeedMessage tripUpdates, boolean fireUpdate);
+
+  public void setVehiclePositions(FeedMessage vehiclePositions);
+
+  public void setVehiclePositions(FeedMessage vehiclePositions,
+      boolean fireUpdate);
+
+  public void setAlerts(FeedMessage alerts);
+
+  public void setAlerts(FeedMessage alerts, boolean fireUpdate);
+
+  public void fireUpdate();
+
 }
