@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="onebusaway-gtfs-realtime-exporter">
   <body>
+    <links>
+      <item name="GitHub Project" href="http://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/" />
+    </links>
     <menu name="Introduction">
-      <item name="About" href="/index.html" />      
+      <item name="About" href="/index.html" />
+      <item name="GitHub Project" href="http://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/" />
       <item name="Release Notes" href="/release-notes.html" />
       <item name="API Javadoc" href="/apidocs/index.html" />
     </menu>
