@@ -2,6 +2,11 @@ Release Notes
 
 * ${currentVersion}
 
+  * Add a listener method to GtfsRealtimeProvider for receiving notification of updates.  Also provide a default
+    implementation of that behavior.
+    
+  * Bump onebusaway-gtfs-realtime-api to 1.1.0.
+
   * Full Documentation: {{${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/${currentVersion}/}}
 
 * 1.0.1
