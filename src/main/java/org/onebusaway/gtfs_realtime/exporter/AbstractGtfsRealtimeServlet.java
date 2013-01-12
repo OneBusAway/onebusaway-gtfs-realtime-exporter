@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusway.gtfs_realtime.exporter;
+package org.onebusaway.gtfs_realtime.exporter;
 
 import java.io.IOException;
 import java.net.URL;

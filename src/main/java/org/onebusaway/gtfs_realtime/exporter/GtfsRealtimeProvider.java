@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusway.gtfs_realtime.exporter;
+package org.onebusaway.gtfs_realtime.exporter;
 
-import javax.inject.Singleton;
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-import com.google.protobuf.Message;
+public interface GtfsRealtimeProvider {
+  
+  public FeedMessage getTripUpdates();
 
-@Singleton
-public class TripUpdatesFileWriter extends AbstractGtfsRealtimeFileWriter {
+  public FeedMessage getVehiclePositions();
 
-  @Override
-  protected Message getMessage() {
-    return _provider.getTripUpdates();
-  }
+  public FeedMessage getAlerts();
+  
+  public void addGtfsRealtimeListener(GtfsRealtimeListener listener);
+  
+  public void removeGtfsRealtimeListener(GtfsRealtimeListener listener);
 }

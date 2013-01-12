@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Google, Inc.
+ * Copyright (C) 2012 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onebusway.gtfs_realtime.exporter;
+package org.onebusaway.gtfs_realtime.exporter;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.protobuf.Message;
 
 @Singleton
-public class VehiclePositionsServlet extends AbstractGtfsRealtimeServlet {
-
-  private static final long serialVersionUID = 1L;
-
-  @Inject
-  public void setProvider(GtfsRealtimeProvider provider) {
-    _provider = provider;
-  }
+public class TripUpdatesFileWriter extends AbstractGtfsRealtimeFileWriter {
 
   @Override
   protected Message getMessage() {
-    return _provider.getVehiclePositions();
+    return _provider.getTripUpdates();
   }
 }

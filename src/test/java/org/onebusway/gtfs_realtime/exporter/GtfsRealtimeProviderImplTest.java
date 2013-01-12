@@ -20,6 +20,9 @@ import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeLibrary;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeListener;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeProviderImpl;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
