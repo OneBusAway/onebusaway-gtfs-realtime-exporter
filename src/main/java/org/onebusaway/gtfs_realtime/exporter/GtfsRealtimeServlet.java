@@ -15,6 +15,7 @@
  */
 package org.onebusaway.gtfs_realtime.exporter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
@@ -24,23 +25,30 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.websocket.WebSocket;
+import org.eclipse.jetty.websocket.WebSocketServlet;
 import org.onebusaway.guice.jetty_exporter.ServletSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.Message;
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-abstract class AbstractGtfsRealtimeServlet extends HttpServlet implements
+public class GtfsRealtimeServlet extends WebSocketServlet implements
     ServletSource {
 
   private static final long serialVersionUID = 1L;
 
   private static final String CONTENT_TYPE = "application/x-google-protobuf";
 
-  protected GtfsRealtimeProvider _provider;
+  private static final Logger _log = LoggerFactory.getLogger(GtfsRealtimeServlet.class);
+
+  protected GtfsRealtimeSource _source;
 
   private URL _url;
 
-  public void setProvider(GtfsRealtimeProvider provider) {
-    _provider = provider;
+  public void setSource(GtfsRealtimeSource source) {
+    _source = source;
   }
 
   public void setUrl(URL url) {
@@ -55,13 +63,18 @@ abstract class AbstractGtfsRealtimeServlet extends HttpServlet implements
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     boolean debug = req.getParameter("debug") != null;
-    Message message = getMessage();
+    Message message = _source.getFeed();
     if (debug) {
       resp.getWriter().print(message);
     } else {
       resp.setContentType(CONTENT_TYPE);
       message.writeTo(resp.getOutputStream());
     }
+  }
+
+  @Override
+  public WebSocket doWebSocketConnect(HttpServletRequest arg0, String arg1) {
+    return new DataWebSocket();
   }
 
   /****
@@ -82,10 +95,43 @@ abstract class AbstractGtfsRealtimeServlet extends HttpServlet implements
    * Protected Methods
    ****/
 
-  /**
-   * Override this method to return the protocol buffer
-   * 
-   * @return
-   */
-  protected abstract Message getMessage();
+  class DataWebSocket implements WebSocket, GtfsRealtimeIncrementalListener {
+
+    private Connection _connection;
+
+    @Override
+    public void onOpen(Connection connection) {
+      _log.info("client connect");
+      _connection = connection;
+      _source.addIncrementalListener(this);
+    }
+
+    @Override
+    public void onClose(int closeCode, String message) {
+      _log.info("client close");
+      _source.removeIncrementalListener(this);
+    }
+
+    /****
+     * {@link GtfsRealtimeIncrementalListener} Interface
+     ****/
+
+    @Override
+    public void handleFeed(FeedMessage feed) {
+      byte[] buffer = null;
+      try {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        feed.writeTo(out);
+        buffer = out.toByteArray();
+      } catch (IOException ex) {
+        throw new IllegalStateException(ex);
+      }
+
+      try {
+        _connection.sendMessage(buffer, 0, buffer.length);
+      } catch (IOException ex) {
+
+      }
+    }
+  }
 }

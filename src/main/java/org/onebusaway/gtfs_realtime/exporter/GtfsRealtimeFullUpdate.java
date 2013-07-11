@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Google, Inc.
+ * Copyright (C) 2013 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,28 @@
  */
 package org.onebusaway.gtfs_realtime.exporter;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.google.protobuf.Message;
+import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 
-@Singleton
-public class VehiclePositionsServlet extends AbstractGtfsRealtimeServlet {
+/**
+ * Specifies a full update to a GTFS-realtime feed, such that all previous
+ * entities are replaced by the new entities contained in the update.
+ * 
+ * @author bdferris
+ * @see GtfsRealtimeIncrementalUpdate
+ * @see GtfsRealtimeSink
+ */
+public class GtfsRealtimeFullUpdate {
 
-  private static final long serialVersionUID = 1L;
+  private List<FeedEntity> entities = new ArrayList<FeedEntity>();
 
-  @Inject
-  public void setProvider(GtfsRealtimeProvider provider) {
-    _provider = provider;
+  public void addEntity(FeedEntity entity) {
+    entities.add(entity);
   }
 
-  @Override
-  protected Message getMessage() {
-    return _provider.getVehiclePositions();
+  public List<FeedEntity> getEntities() {
+    return entities;
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 Google, Inc.
+ * Copyright (C) 2013 Google, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,23 @@
 package org.onebusaway.gtfs_realtime.exporter;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import com.google.transit.realtime.GtfsRealtime.FeedHeader.Incrementality;
 
-public interface GtfsRealtimeProvider {
-  
-  public FeedMessage getTripUpdates();
+/**
+ * Defines an interface for receiving incremental GTFS-realtime updates.
+ * 
+ * @author bdferris
+ * 
+ */
+public interface GtfsRealtimeIncrementalListener {
 
-  public FeedMessage getVehiclePositions();
-
-  public FeedMessage getAlerts();
-  
-  public void addGtfsRealtimeListener(GtfsRealtimeListener listener);
-  
-  public void removeGtfsRealtimeListener(GtfsRealtimeListener listener);
+  /**
+   * Handle a feed update. Updates can either be full datasets (as indicated by
+   * a {@link Incrementality#FULL_DATASET} value in the header) or incremental
+   * updates to the most-recent full dataset (as indicated by a
+   * {@link Incrementality#DIFFERENTIAL} value in the header).
+   * 
+   * @param feed the feed update
+   */
+  public void handleFeed(FeedMessage feed);
 }

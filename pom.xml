@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>onebusaway</artifactId>
@@ -12,7 +13,10 @@
   <url>https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/wiki/</url>
 
   <properties>
-    <gtfs_realtime_api_version>1.1.0</gtfs_realtime_api_version>
+    <gtfs_realtime_api_version>1.1.1-SNAPSHOT</gtfs_realtime_api_version>
+    <jetty.version>8.1.11.v20130520</jetty.version>
+    <!-- These properties are primarily used in configuring joint integration tests -->
+    <org_onebusaway_test_port>9900</org_onebusaway_test_port>
   </properties>
 
   <repositories>
@@ -45,12 +49,22 @@
     <dependency>
       <groupId>org.onebusaway</groupId>
       <artifactId>onebusaway-guice-jetty-exporter</artifactId>
-      <version>1.0.1</version>
+      <version>1.1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.onebusaway</groupId>
       <artifactId>onebusaway-gtfs-realtime-api</artifactId>
       <version>${gtfs_realtime_api_version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-websocket</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.2</version>
     </dependency>
 
     <dependency>
@@ -65,6 +79,32 @@
       <version>1.8.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.onebusaway</groupId>
+      <artifactId>onebusaway-guice-jsr250</artifactId>
+      <version>1.0.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <org_onebusaway_test_port>${org_onebusaway_test_port}</org_onebusaway_test_port>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

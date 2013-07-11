@@ -19,31 +19,95 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.AlertsExporter;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.MixedFeedExporter;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.TripUpdatesExporter;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.VehiclePositionsExporter;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.Alerts;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.MixedFeed;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.TripUpdates;
+import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.VehiclePositions;
 import org.onebusaway.guice.jetty_exporter.JettyExporterModule;
+import org.onebusaway.guice.jsr250.JSR250Module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+/**
+ * Provides Guice support for wiring up the services provided by the
+ * onebusaway-gtfs-realtime-exporter library, along with all its dependencies.
+ * 
+ * Here's a quick example of the library in use:
+ * 
+ * <pre>
+ * {@code
+ * Set<Module> modules = new HashSet<Module>();
+ * GtfsRealtimeExporterModule.addModuleAndDependencies(modules);
+ * Injector injector = Guice.createInjector(modules);
+ * }
+ * </pre>
+ * 
+ * @author bdferris
+ */
 public class GtfsRealtimeExporterModule extends AbstractModule {
 
   public static final String NAME_EXECUTOR = "org.onebusway.gtfs_realtime.exporter.GtfsRealtimeExporterModule.executor";
 
+  /**
+   * Adds a {@link GtfsRealtimeExporterModule} instance to the specified set of
+   * modules, along with all its dependencies.
+   * 
+   * @param modules the resulting set of Guice modules
+   */
   public static void addModuleAndDependencies(Set<Module> modules) {
     modules.add(new GtfsRealtimeExporterModule());
     JettyExporterModule.addModuleAndDependencies(modules);
+    JSR250Module.addModuleAndDependencies(modules);
   }
 
+  /**
+   * See {@link GtfsRealtimeExporter} for a discussion of the somewhat
+   * convoluted binding scheme used here.
+   */
   @Override
   protected void configure() {
-    bind(GtfsRealtimeProvider.class).to(GtfsRealtimeProviderImpl.class);
-    bind(GtfsRealtimeMutableProvider.class).to(GtfsRealtimeProviderImpl.class);
-    bind(AlertsFileWriter.class);
-    bind(TripUpdatesFileWriter.class);
-    bind(VehiclePositionsFileWriter.class);
-    bind(AlertsServlet.class);
-    bind(TripUpdatesServlet.class);
-    bind(VehiclePositionsServlet.class);
+
+    bind(GtfsRealtimeSink.class).annotatedWith(Alerts.class).to(
+        AlertsExporter.class);
+    bind(GtfsRealtimeSource.class).annotatedWith(Alerts.class).to(
+        AlertsExporter.class);
+    bind(GtfsRealtimeExporter.class).annotatedWith(Alerts.class).to(
+        AlertsExporter.class);
+    bind(AlertsExporter.class).to(GtfsRealtimeExporterImpl.class).in(
+        Singleton.class);
+
+    bind(GtfsRealtimeSink.class).annotatedWith(TripUpdates.class).to(
+        TripUpdatesExporter.class);
+    bind(GtfsRealtimeSource.class).annotatedWith(TripUpdates.class).to(
+        TripUpdatesExporter.class);
+    bind(GtfsRealtimeExporter.class).annotatedWith(TripUpdates.class).to(
+        TripUpdatesExporter.class);
+    bind(TripUpdatesExporter.class).to(GtfsRealtimeExporterImpl.class).in(
+        Singleton.class);
+
+    bind(GtfsRealtimeSink.class).annotatedWith(VehiclePositions.class).to(
+        VehiclePositionsExporter.class);
+    bind(GtfsRealtimeSource.class).annotatedWith(VehiclePositions.class).to(
+        VehiclePositionsExporter.class);
+    bind(GtfsRealtimeExporter.class).annotatedWith(VehiclePositions.class).to(
+        VehiclePositionsExporter.class);
+    bind(VehiclePositionsExporter.class).to(GtfsRealtimeExporterImpl.class).in(
+        Singleton.class);
+
+    bind(GtfsRealtimeSink.class).annotatedWith(MixedFeed.class).to(
+        MixedFeedExporter.class);
+    bind(GtfsRealtimeSource.class).annotatedWith(MixedFeed.class).to(
+        MixedFeedExporter.class);
+    bind(MixedFeedExporter.class).to(GtfsRealtimeExporterImpl.class).in(
+        Singleton.class);
+
     bind(ScheduledExecutorService.class).annotatedWith(
         Names.named(NAME_EXECUTOR)).toInstance(
         Executors.newSingleThreadScheduledExecutor());

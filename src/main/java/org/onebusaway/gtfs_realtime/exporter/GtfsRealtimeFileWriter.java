@@ -34,11 +34,18 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.Message;
 
-public abstract class AbstractGtfsRealtimeFileWriter {
+/**
+ * Provides functionality for periodically writing a GTFS-realtime feed to an
+ * output file.
+ * 
+ * @author bdferris
+ * 
+ */
+public class GtfsRealtimeFileWriter {
 
-  private static final Logger _log = LoggerFactory.getLogger(AbstractGtfsRealtimeFileWriter.class);
+  private static final Logger _log = LoggerFactory.getLogger(GtfsRealtimeFileWriter.class);
 
-  protected GtfsRealtimeProvider _provider;
+  protected GtfsRealtimeSource _source;
 
   private ScheduledExecutorService _executor;
 
@@ -48,19 +55,25 @@ public abstract class AbstractGtfsRealtimeFileWriter {
 
   private ScheduledFuture<?> _task;
 
-  @Inject
-  public void setProvider(GtfsRealtimeProvider provider) {
-    _provider = provider;
+  public void setSource(GtfsRealtimeSource source) {
+    _source = source;
   }
 
   @Inject
-  public void setExecutor(
-      @Named(GtfsRealtimeExporterModule.NAME_EXECUTOR) ScheduledExecutorService executor) {
+  public void setExecutor(@Named(GtfsRealtimeExporterModule.NAME_EXECUTOR)
+  ScheduledExecutorService executor) {
     _executor = executor;
   }
 
+  /**
+   * @param path the output path where the feed will be written
+   */
   public void setPath(File path) {
     _path = path;
+  }
+
+  public int getPeriod() {
+    return _period;
   }
 
   public void setPeriod(int timeInSeconds) {
@@ -81,10 +94,8 @@ public abstract class AbstractGtfsRealtimeFileWriter {
     }
   }
 
-  protected abstract Message getMessage();
-
   protected void writeMessageToFile() throws IOException {
-    Message message = getMessage();
+    Message message = _source.getFeed();
     OutputStream out = new BufferedOutputStream(new FileOutputStream(_path));
     message.writeTo(out);
     out.close();
