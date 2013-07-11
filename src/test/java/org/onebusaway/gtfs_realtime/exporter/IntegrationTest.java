@@ -101,6 +101,7 @@ public class IntegrationTest {
 
     Set<Module> modules = new HashSet<Module>();
     GtfsRealtimeExporterModule.addModuleAndDependencies(modules);
+    JSR250Module.addModuleAndDependencies(modules);
     Injector injector = Guice.createInjector(modules);
     injector.injectMembers(this);
 

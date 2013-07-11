@@ -1,0 +1,141 @@
+# OneBusAway GTFS-realtime Exporter
+
+#set( $H = '#' ) ## When using velocity templating (a .vm file), the ## indicates a Velocity comment, which makes Markdown section headers tricky
+
+Project documentation for the `onebusaway-gtfs-realtime-exporter`, which provides a Java library for easily sharing
+[GTFS-realtime](https://developers.google.com/transit/gtfs-realtime) data via an embedded web-server or by writing the
+data to file.
+
+**Current Version:** ${currentVersion}
+
+$H$H Getting the Library
+
+If you are using Maven to manage your project, it's easy to add a dependency for the library.  First, add the
+[OneBusAway Maven repository](https://github.com/OneBusAway/onebusaway/wiki/Maven-Repository) to your project's `pom.xml`.
+Then, add a dependency for the library itself.  Note that we also add a dependency on `onebusaway-guice-jsr250`, which we
+use for starting / stopping services.
+
+~~~
+<dependencies>
+  <dependency>
+    <groupId>org.onebusaway</groupId>
+    <artifactId>onebusaway-gtfs-realtime-exporter</artifactId>
+    <version>${currentVersion}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.onebusaway</groupId>
+    <artifactId>onebusaway-guice-jsr250</artifactId>
+    <version>${onebusaway_guice_jsr250_version}</version>
+  </dependency>
+</dependencies>
+~~~
+
+$H$H Using the Library
+
+We make heavy use of [Guice](https://code.google.com/p/google-guice/) for dependency injection and management.
+
+$H$H Example Code
+
+First, we introduce a `VehiclePositionsProducer`, which is responsible for actually generating GTFS-realtime data about
+transit vehicles.  Typically, that data comes from some other, internal data stream.  The producer asks that an instance
+of [GtfsRealtimeSink](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeSink.html) be injected into the class,
+annotating with [@VehiclePositions](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeGuiceBindingTypes.VehiclePositions.html) 
+to indicate that the GTFS-realtime sink should be for vehicle position data.
+
+The producer spawns a thread that repeatedly generates incremental vehicle position updates.  Specifically, the producer
+sends [GtfsRealtimeIncrementalUpdate](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeIncrementalUpdate.html)
+objects to the sink every time it wants to send a batch of incremental updates.  If you'd rather not send incremental
+updates, but instead to perform full feed updates, see [GtfsRealtimeFullUpdate](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeFullUpdate.html)
+instead.
+
+~~~
+@Singleton
+public class VehiclePositionsProducer {
+
+  private GtfsRealtimeSink _vehiclePositionsSink;
+
+  @Inject
+  public void setVehiclePositionsSink(@vehiclePositions GtfsRealtimeSink vehiclePositionsSink) {
+    _vehiclePositionsSink = vehiclePositionsSink;
+  }
+  
+  @PostConstruct
+  public void start() {
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    executor.submit(new Runnable() {
+      @Override
+      public void run() {
+        runLoop();
+      }    
+    });
+  }
+  
+  private void runLoop() {
+    while(true) {
+      GtfsRealtimeIncrementalUpdate update = new GtfsRealtimeIncrementalUpdate();
+      FeedEntity.Builder entity = FeedEntity.newBuilder();
+      entity.setId("v123");
+      VehiclePosition.Builder vehicle = VehiclePosition.newBuilder();
+      // ... fill in vehicle position data here ...
+      entity.setVehicle(vehicle);
+      update.addUpdatedEntity(entity.build());
+      _vehiclePositionsSink.handleIncrementalUpdate(update);
+    }
+  }
+}
+~~~
+
+Once we have our GTFS-realtime producer, we need to wire it up with other modules and start everything running.
+Here, we show the `GtfsRealtimeProducerDemo` class, which is responsible for configuring a Guice Injector
+with all the necessary dependencies, wiring up our GTFS-realtime.  We then inject a couple of classe instances:
+
+* [GtfsRealtimeSource](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeSource.html) - a source of
+  GTFS-realtime data that we'll wire up to various export options.  Again, we annotate with [@VehiclePositions](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeGuiceBindingTypes.VehiclePositions.html)
+  to indicate that we care about vehicle position data.
+* [VehiclePositionsProducer] - we inject an instance to make sure it gets created
+* LifecycleService - we use this to start up all services annotated with @PostConstruct
+
+Next, we wire up our GTFS-realtime data source to a [GtfsRealtimeServlet](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeServlet.html)
+in order to share the feed via HTTP.  We also connect the source to a [GtfsRealtimeFileWriter](./apidocs/org/onebusaway/gtfs_realtime/exporter/GtfsRealtimeFileWriter.html)
+in order to periodically write the feed to an output file.  Finally, we start everything up.
+
+~~~
+public class GtfsRealtimeProducerDemo {
+
+  private GtfsRealtimeSource _vehiclePositionsSource;
+  private LifecycleService _lifecycleService;
+  
+  @Inject
+  public void setVehiclePositionsProducer(VehiclePositionsProducer producer) {
+    // This is just here to make sure VehiclePositionsProducer gets instantiated.
+  }
+  
+  @Inject
+  public void setVehiclePositionsSource(@VehiclePositions GtfsRealtimeSource vehiclePositionsSource) {
+    _vehiclePositionsSource = vehiclePositionsSource;
+  }
+  
+  @Inject
+  public void setLifecycleService(LifecycleService lifecycleService) {
+    _lifecycleService = lifecycleService;
+  }
+  
+  public void run() {
+    Set<Module> modules = new HashSet<Module>();
+    GtfsRealtimeExporterModule.addModuleAndDependencies(modules);
+    JSR250Module.addModuleAndDependencies(modules);
+    Injector injector = Guice.createInjector(modules);
+    injector.injectMembers(this);
+    
+    GtfsRealtimeServlet servlet = injector.getInstance(GtfsRealtimeServlet.class);
+    servlet.setSource(_vehiclePositionsSource);
+    servlet.setUrl(new URL("http://localhost:8080/trip-updates"));
+
+    GtfsRealtimeFileWriter fileWriter = injector.getInstance(GtfsRealtimeFileWriter.class);
+    fileWriter.setSource(_vehiclePositionsSource);
+    fileWriter.setPath(new File("/tmp/trip-updates.pd"));
+    
+    _lifecycleService.start();    
+  }
+}
+~~~

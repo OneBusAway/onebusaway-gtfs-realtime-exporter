@@ -28,7 +28,6 @@ import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.Mixed
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.TripUpdates;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeGuiceBindingTypes.VehiclePositions;
 import org.onebusaway.guice.jetty_exporter.JettyExporterModule;
-import org.onebusaway.guice.jsr250.JSR250Module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -64,7 +63,6 @@ public class GtfsRealtimeExporterModule extends AbstractModule {
   public static void addModuleAndDependencies(Set<Module> modules) {
     modules.add(new GtfsRealtimeExporterModule());
     JettyExporterModule.addModuleAndDependencies(modules);
-    JSR250Module.addModuleAndDependencies(modules);
   }
 
   /**

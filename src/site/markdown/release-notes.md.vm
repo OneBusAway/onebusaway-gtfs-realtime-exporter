@@ -1,0 +1,26 @@
+# Release Notes
+
+#set( $H = '#' ) ## When using velocity templating (a .vm file), the ## indicates a Velocity comment, which makes Markdown section headers tricky
+
+$H$H ${currentVersion}
+
+* Full Documentation: ${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/${currentVersion}/
+
+$H$H 1.1.0
+
+* Add a listener method to GtfsRealtimeProvider for receiving notification of updates.  Also provide a default
+  implementation of that behavior.
+    
+* Bump onebusaway-gtfs-realtime-api to 1.1.0.
+
+* Full Documentation: ${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/1.1.0/
+
+$H$H 1.0.1
+
+* Fix a bug with the timestamp value in the GTFS-realtime FeedHeader.
+* Full Documentation: ${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/1.0.1/
+  
+$H$H 1.0.0
+
+* Initial release
+* Full Documentation: ${site_base_url}/onebusaway-gtfs-realtime-from-siri-cli/1.0.0/

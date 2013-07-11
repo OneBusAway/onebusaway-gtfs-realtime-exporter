@@ -40,11 +40,9 @@ import com.google.inject.BindingAnnotation;
  * we'd use the following:
  * 
  * <pre>
- * {@code
- * @Inject
- * void setTripUpdatesSink(@TripUpdates GtfsRealtimeSink tripUpdatesSink) {
+ * {@literal @}Inject
+ * void setTripUpdatesSink({@literal @}TripUpdates GtfsRealtimeSink tripUpdatesSink) {
  *   ...
- * }
  * }
  * </pre>
  * 
@@ -63,24 +61,57 @@ import com.google.inject.BindingAnnotation;
  * @author bdferris
  */
 public class GtfsRealtimeGuiceBindingTypes {
+
+  /**
+   * Annotation to indicate that a wired instance of {@link GtfsRealtimeSink},
+   * {@link GtfsRealtimeSource}, or {@link GtfsRealtimeExporter} must support
+   * trip updates data.
+   * 
+   * @author bdferris
+   * @see GtfsRealtimeGuiceBindingTypes
+   */
   @BindingAnnotation
   @Target({FIELD, PARAMETER, METHOD})
   @Retention(RUNTIME)
   public @interface TripUpdates {
   }
 
+  /**
+   * Annotation to indicate that a wired instance of {@link GtfsRealtimeSink},
+   * {@link GtfsRealtimeSource}, or {@link GtfsRealtimeExporter} must support
+   * vehicle positions data.
+   * 
+   * @author bdferris
+   * @see GtfsRealtimeGuiceBindingTypes
+   */
   @BindingAnnotation
   @Target({FIELD, PARAMETER, METHOD})
   @Retention(RUNTIME)
   public @interface VehiclePositions {
   }
 
+  /**
+   * Annotation to indicate that a wired instance of {@link GtfsRealtimeSink},
+   * {@link GtfsRealtimeSource}, or {@link GtfsRealtimeExporter} must support
+   * alerts data.
+   * 
+   * @author bdferris
+   * @see GtfsRealtimeGuiceBindingTypes
+   */
   @BindingAnnotation
   @Target({FIELD, PARAMETER, METHOD})
   @Retention(RUNTIME)
   public @interface Alerts {
   }
 
+  /**
+   * Annotation to indicate that a wired instance of {@link GtfsRealtimeSink},
+   * {@link GtfsRealtimeSource}, or {@link GtfsRealtimeExporter} must support a
+   * mixture of trip updates, vehicle positions, and alerts data.
+   * 
+   * @author bdferris
+   * @see GtfsRealtimeGuiceBindingTypes
+   */
   @BindingAnnotation
   @Target({FIELD, PARAMETER, METHOD})
   @Retention(RUNTIME)

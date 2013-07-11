@@ -34,6 +34,13 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.Message;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
+/**
+ * Provides functionality to export a GTFS-realtime feed via HTTP, with support
+ * for both traditional HTTP GET requests and also incremental requests via
+ * WebSockets.
+ * 
+ * @author bdferris
+ */
 public class GtfsRealtimeServlet extends WebSocketServlet implements
     ServletSource {
 
