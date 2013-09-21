@@ -4,7 +4,7 @@
   <parent>
     <artifactId>onebusaway</artifactId>
     <groupId>org.onebusaway</groupId>
-    <version>1.1.10-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>onebusaway-gtfs-realtime-exporter</artifactId>
   <version>1.2.0-SNAPSHOT</version>
@@ -15,7 +15,7 @@
   <properties>
     <gtfs_realtime_api_version>1.1.1-SNAPSHOT</gtfs_realtime_api_version>
     <onebusaway_guice_jsr250_version>1.0.2</onebusaway_guice_jsr250_version>
-    <jetty.version>8.1.11.v20130520</jetty.version>
+    <jetty.version>9.0.5.v20130815</jetty.version>
     <!-- These properties are primarily used in configuring joint integration tests -->
     <org_onebusaway_test_port>9900</org_onebusaway_test_port>
   </properties>
@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.onebusaway</groupId>
       <artifactId>onebusaway-guice-jetty-exporter</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>1.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.onebusaway</groupId>
@@ -58,8 +58,8 @@
       <version>${gtfs_realtime_api_version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-websocket</artifactId>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-server</artifactId>
       <version>${jetty.version}</version>
     </dependency>
     <dependency>

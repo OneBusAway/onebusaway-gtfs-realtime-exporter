@@ -32,11 +32,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.jetty.websocket.WebSocket;
-import org.eclipse.jetty.websocket.WebSocket.Connection;
-import org.eclipse.jetty.websocket.WebSocket.OnBinaryMessage;
-import org.eclipse.jetty.websocket.WebSocketClient;
-import org.eclipse.jetty.websocket.WebSocketClientFactory;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -161,7 +160,7 @@ public class IntegrationTest {
     JSR250Module.addModuleAndDependencies(modules);
     Injector injector = Guice.createInjector(modules);
     injector.injectMembers(this);
-    
+
     GtfsRealtimeServlet servlet = injector.getInstance(GtfsRealtimeServlet.class);
     servlet.setSource(_exporter);
     servlet.setUrl(getUrl());
@@ -178,11 +177,10 @@ public class IntegrationTest {
       _exporter.handleIncrementalUpdate(update);
     }
 
-    WebSocketClientFactory factory = new WebSocketClientFactory();
-    factory.start();
-    WebSocketClient client = factory.newWebSocketClient();
+    WebSocketClient client = new WebSocketClient();
+    client.start();
     GtfsRealtimeSocket socket = new GtfsRealtimeSocket();
-    Future<Connection> future = client.open(getWebsocketUri(), socket);
+    Future<Session> future = client.connect(socket, getWebsocketUri());
     future.get(10, TimeUnit.SECONDS);
 
     CountDownLatch latch = socket.setLatch(1);
@@ -239,7 +237,8 @@ public class IntegrationTest {
     }
   }
 
-  private static class GtfsRealtimeSocket implements WebSocket, OnBinaryMessage {
+  @WebSocket
+  public static class GtfsRealtimeSocket {
 
     private CountDownLatch _latch = null;
 
@@ -254,17 +253,7 @@ public class IntegrationTest {
       return _latch;
     }
 
-    @Override
-    public void onOpen(Connection connection) {
-
-    }
-
-    @Override
-    public void onClose(int closeCode, String message) {
-
-    }
-
-    @Override
+    @OnWebSocketMessage
     public void onMessage(byte[] data, int offset, int length) {
       try {
         FeedMessage feed = FeedMessage.parseFrom(

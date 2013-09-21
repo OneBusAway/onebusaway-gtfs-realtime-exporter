@@ -18,6 +18,7 @@ package org.onebusaway.gtfs_realtime.exporter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -25,8 +26,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.websocket.WebSocket;
-import org.eclipse.jetty.websocket.WebSocketServlet;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.UpgradeRequest;
+import org.eclipse.jetty.websocket.api.UpgradeResponse;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.onebusaway.guice.jetty_exporter.ServletSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +72,15 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
   }
 
   /****
+   * {@link WebSocketServlet} Interface
+   ****/
+
+  @Override
+  public void configure(WebSocketServletFactory factory) {
+    factory.setCreator(new WebsocketCreatorImpl());
+  }
+
+  /****
    * {@link HttpServlet} Interface
    ****/
 
@@ -77,11 +95,6 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
       resp.setContentType(CONTENT_TYPE);
       message.writeTo(resp.getOutputStream());
     }
-  }
-
-  @Override
-  public WebSocket doWebSocketConnect(HttpServletRequest arg0, String arg1) {
-    return new DataWebSocket();
   }
 
   /****
@@ -102,19 +115,28 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
    * Protected Methods
    ****/
 
-  class DataWebSocket implements WebSocket, GtfsRealtimeIncrementalListener {
-
-    private Connection _connection;
-
+  class WebsocketCreatorImpl implements WebSocketCreator {
     @Override
-    public void onOpen(Connection connection) {
+    public Object createWebSocket(UpgradeRequest req, UpgradeResponse resp) {
+      return new DataWebSocket();
+    }
+    
+  }
+  
+  @WebSocket
+  public class DataWebSocket implements GtfsRealtimeIncrementalListener {
+
+    private Session _session;
+
+    @OnWebSocketConnect
+    public void onOpen(Session session) {
       _log.info("client connect");
-      _connection = connection;
+      _session = session;
       _source.addIncrementalListener(this);
     }
 
-    @Override
-    public void onClose(int closeCode, String message) {
+    @OnWebSocketClose
+    public void onClose(Session sesion, int closeCode, String message) {
       _log.info("client close");
       _source.removeIncrementalListener(this);
     }
@@ -133,12 +155,14 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
       } catch (IOException ex) {
         throw new IllegalStateException(ex);
       }
-
+      
       try {
-        _connection.sendMessage(buffer, 0, buffer.length);
+        RemoteEndpoint remote = _session.getRemote();
+        remote.sendBytes(ByteBuffer.wrap(buffer));
       } catch (IOException ex) {
 
       }
     }
   }
+
 }
