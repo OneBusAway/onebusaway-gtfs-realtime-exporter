@@ -156,7 +156,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
      ****/
 
     @Override
-    public synchronized void handleFeed(FeedMessage feed) {
+    public void handleFeed(FeedMessage feed) {
       byte[] buffer = null;
       try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -166,18 +166,31 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
         throw new IllegalStateException(ex);
       }
 
-      synchronized (this) {
-        if (_session == null || !_session.isOpen()) {
-          return;
-        }
-        try {
-          RemoteEndpoint remote = _session.getRemote();
-          remote.sendBytes(ByteBuffer.wrap(buffer));
-        } catch (IOException ex) {
+      sendMessage(buffer);
+    }
 
+    private synchronized void sendMessage(byte[] buffer) {
+      if (_session == null || !_session.isOpen()) {
+        return;
+      }
+      try {
+        RemoteEndpoint remote = _session.getRemote();
+        remote.sendBytes(ByteBuffer.wrap(buffer));
+      } catch (Exception ex) {
+        // If anything goes wrong, we close the connection.
+        _log.error("error sending message to remote WebSocket client", ex);
+        try {
+          // The @OnWebSocketClose event might have already been trigger during
+          // our attempt to write, but if not, let's close the connection
+          // ourselves.
+          if (_session != null) {
+            // This should automatically trigger an @OnWebSocketClose event.
+            _session.close();
+          }
+        } catch (IOException ex2) {
+          _log.error("error closing remote WebSocket connection", ex2);
         }
       }
     }
   }
-
 }
