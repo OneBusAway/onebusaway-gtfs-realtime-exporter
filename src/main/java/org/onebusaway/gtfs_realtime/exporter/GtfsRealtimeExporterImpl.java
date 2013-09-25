@@ -15,10 +15,10 @@
  */
 package org.onebusaway.gtfs_realtime.exporter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.AlertsExporter;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.MixedFeedExporter;
@@ -41,7 +41,7 @@ import com.google.transit.realtime.GtfsRealtimeOneBusAway.OneBusAwayFeedHeader;
 class GtfsRealtimeExporterImpl implements AlertsExporter, TripUpdatesExporter,
     VehiclePositionsExporter, MixedFeedExporter {
 
-  private List<GtfsRealtimeIncrementalListener> _listeners = new ArrayList<GtfsRealtimeIncrementalListener>();
+  private List<GtfsRealtimeIncrementalListener> _listeners = new CopyOnWriteArrayList<GtfsRealtimeIncrementalListener>();
 
   private FeedHeader _header;
 
@@ -120,7 +120,7 @@ class GtfsRealtimeExporterImpl implements AlertsExporter, TripUpdatesExporter,
       header.setIncrementality(Incrementality.FULL_DATASET);
       header.setTimestamp(System.currentTimeMillis() / 1000);
       header.setGtfsRealtimeVersion(GtfsRealtimeConstants.VERSION);
-      
+
       setIncrementalIndex(header, _incrementalIndex - 1);
 
       FeedMessage.Builder feed = FeedMessage.newBuilder();
@@ -132,15 +132,13 @@ class GtfsRealtimeExporterImpl implements AlertsExporter, TripUpdatesExporter,
   }
 
   @Override
-  public synchronized void addIncrementalListener(
-      GtfsRealtimeIncrementalListener listener) {
+  public void addIncrementalListener(GtfsRealtimeIncrementalListener listener) {
     _listeners.add(listener);
     listener.handleFeed(getFeed());
   }
 
   @Override
-  public synchronized void removeIncrementalListener(
-      GtfsRealtimeIncrementalListener listener) {
+  public void removeIncrementalListener(GtfsRealtimeIncrementalListener listener) {
     _listeners.remove(listener);
   }
 

@@ -120,9 +120,9 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     public Object createWebSocket(UpgradeRequest req, UpgradeResponse resp) {
       return new DataWebSocket();
     }
-    
+
   }
-  
+
   @WebSocket
   public class DataWebSocket implements GtfsRealtimeIncrementalListener {
 
@@ -131,7 +131,14 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     @OnWebSocketConnect
     public void onOpen(Session session) {
       _log.info("client connect");
-      _session = session;
+      synchronized (this) {
+        _session = session;
+      }
+      // When we add ourselves as an incremental listener to the
+      // GtfsRealtimeSource, it typically triggers a "handleFeed" update
+      // immediately. Thus, we don't want to call this until we've released the
+      // _session lock, otherwise we'll get a deadlock in the handleFeed()
+      // method.
       _source.addIncrementalListener(this);
     }
 
@@ -139,6 +146,9 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     public void onClose(Session sesion, int closeCode, String message) {
       _log.info("client close");
       _source.removeIncrementalListener(this);
+      synchronized (this) {
+        _session = null;
+      }
     }
 
     /****
@@ -146,7 +156,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
      ****/
 
     @Override
-    public void handleFeed(FeedMessage feed) {
+    public synchronized void handleFeed(FeedMessage feed) {
       byte[] buffer = null;
       try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -155,12 +165,17 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
       } catch (IOException ex) {
         throw new IllegalStateException(ex);
       }
-      
-      try {
-        RemoteEndpoint remote = _session.getRemote();
-        remote.sendBytes(ByteBuffer.wrap(buffer));
-      } catch (IOException ex) {
 
+      synchronized (this) {
+        if (_session == null || !_session.isOpen()) {
+          return;
+        }
+        try {
+          RemoteEndpoint remote = _session.getRemote();
+          remote.sendBytes(ByteBuffer.wrap(buffer));
+        } catch (IOException ex) {
+
+        }
       }
     }
   }
