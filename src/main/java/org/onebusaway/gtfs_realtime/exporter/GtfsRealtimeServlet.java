@@ -175,7 +175,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
       }
       try {
         RemoteEndpoint remote = _session.getRemote();
-        remote.sendBytes(ByteBuffer.wrap(buffer));
+        remote.sendBytesByFuture(ByteBuffer.wrap(buffer));
       } catch (Exception ex) {
         // If anything goes wrong, we close the connection.
         _log.error("error sending message to remote WebSocket client", ex);
