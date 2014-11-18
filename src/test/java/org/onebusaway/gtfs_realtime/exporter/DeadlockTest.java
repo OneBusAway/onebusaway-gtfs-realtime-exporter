@@ -117,7 +117,7 @@ public class DeadlockTest {
 
   private static URL getUrl() {
     try {
-      String port = System.getProperty("org_onebusaway_test_port", "8080");
+      String port = System.getProperty("org_onebusaway_test_port", "8182");
       return new URL("http://localhost:" + port + "/my-servlet");
     } catch (MalformedURLException ex) {
       throw new IllegalStateException(ex);
@@ -126,7 +126,7 @@ public class DeadlockTest {
 
   private static URI getWebsocketUri() {
     try {
-      String port = System.getProperty("org_onebusaway_test_port", "8080");
+      String port = System.getProperty("org_onebusaway_test_port", "8182");
       return new URI("ws://localhost:" + port + "/my-servlet");
     } catch (URISyntaxException ex) {
       throw new IllegalStateException(ex);
