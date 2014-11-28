@@ -24,6 +24,8 @@ import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.AlertsExporter
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.MixedFeedExporter;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.TripUpdatesExporter;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.VehiclePositionsExporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedHeader;
@@ -41,6 +43,8 @@ import com.google.transit.realtime.GtfsRealtimeOneBusAway.OneBusAwayFeedHeader;
 class GtfsRealtimeExporterImpl implements AlertsExporter, TripUpdatesExporter,
     VehiclePositionsExporter, MixedFeedExporter {
 
+  private static final Logger _log = LoggerFactory.getLogger(GtfsRealtimeExporterImpl.class);
+	
   private List<GtfsRealtimeIncrementalListener> _listeners = new CopyOnWriteArrayList<GtfsRealtimeIncrementalListener>();
 
   private FeedHeader _header;

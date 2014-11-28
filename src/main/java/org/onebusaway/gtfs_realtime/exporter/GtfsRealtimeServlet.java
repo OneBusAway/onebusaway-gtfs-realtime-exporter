@@ -131,9 +131,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     @OnWebSocketConnect
     public void onOpen(Session session) {
       _log.info("client connect");
-      synchronized (this) {
-        _session = session;
-      }
+      _session = session;
       // When we add ourselves as an incremental listener to the
       // GtfsRealtimeSource, it typically triggers a "handleFeed" update
       // immediately. Thus, we don't want to call this until we've released the
@@ -145,14 +143,13 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     }
 
     @OnWebSocketClose
-    public void onClose(Session sesion, int closeCode, String message) {
-      _log.info("client close");
-      _log.info("pre remove lock");
-      _source.removeIncrementalListener(this);
-      _log.info("post remove lock");
-      synchronized (this) {
+    public void onClose(Session session, int closeCode, String message) {
+    	if (session == null) {
+    		_log.error("onClose called with null session, ignorning");
+    		return;
+    	}
         _session = null;
-      }
+      _source.removeIncrementalListener(this);
     }
 
     /****
@@ -174,12 +171,13 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     }
 
     private synchronized void sendMessage(byte[] buffer) {
-      if (_session == null || !_session.isOpen()) {
+    	Session session = _session;  // copy handle to remove synch issues
+      if (session == null || !session.isOpen()) {
     	  _log.error("no session for sendMessage");
         return;
       }
       try {
-        RemoteEndpoint remote = _session.getRemote();
+        RemoteEndpoint remote = session.getRemote();
         remote.sendBytes(ByteBuffer.wrap(buffer));
       } catch (Exception ex) {
         // If anything goes wrong, we close the connection.
@@ -188,9 +186,9 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
           // The @OnWebSocketClose event might have already been trigger during
           // our attempt to write, but if not, let's close the connection
           // ourselves.
-          if (_session != null) {
+          if (session != null) {
             // This should automatically trigger an @OnWebSocketClose event.
-            _session.close();
+            session.close();
           }
         } catch (IOException ex2) {
           _log.error("error closing remote WebSocket connection", ex2);
