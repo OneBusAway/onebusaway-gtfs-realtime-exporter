@@ -139,13 +139,17 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
       // immediately. Thus, we don't want to call this until we've released the
       // _session lock, otherwise we'll get a deadlock in the handleFeed()
       // method.
+      _log.info("pre add lock");
       _source.addIncrementalListener(this);
+      _log.info("post add lock");;
     }
 
     @OnWebSocketClose
     public void onClose(Session sesion, int closeCode, String message) {
       _log.info("client close");
+      _log.info("pre remove lock");
       _source.removeIncrementalListener(this);
+      _log.info("post remove lock");
       synchronized (this) {
         _session = null;
       }
@@ -171,7 +175,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
 
     private synchronized void sendMessage(byte[] buffer) {
       if (_session == null || !_session.isOpen()) {
-    	  _log.error("whoops");
+    	  _log.error("no session for sendMessage");
         return;
       }
       try {
