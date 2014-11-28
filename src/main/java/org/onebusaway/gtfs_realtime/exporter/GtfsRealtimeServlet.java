@@ -171,6 +171,7 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
 
     private synchronized void sendMessage(byte[] buffer) {
       if (_session == null || !_session.isOpen()) {
+    	  _log.error("whoops");
         return;
       }
       try {

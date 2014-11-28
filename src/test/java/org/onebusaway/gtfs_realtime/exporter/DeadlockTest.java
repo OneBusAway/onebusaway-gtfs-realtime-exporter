@@ -162,6 +162,7 @@ public class DeadlockTest {
     		// OpenJDK throws exceptions on close
     	}
       }
+      _log.info("source exiting");
     }
   }
 
