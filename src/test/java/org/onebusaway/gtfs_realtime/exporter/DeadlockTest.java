@@ -17,6 +17,7 @@ package org.onebusaway.gtfs_realtime.exporter;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -153,9 +154,13 @@ public class DeadlockTest {
       final FeedEntity feedEntity = entity.build();
 
       while (!Thread.interrupted()) {
-        GtfsRealtimeIncrementalUpdate update = new GtfsRealtimeIncrementalUpdate();
-        update.addUpdatedEntity(feedEntity);
-        _sink.handleIncrementalUpdate(update);
+    	try {
+          GtfsRealtimeIncrementalUpdate update = new GtfsRealtimeIncrementalUpdate();
+          update.addUpdatedEntity(feedEntity);
+          _sink.handleIncrementalUpdate(update);
+    	} catch (Exception ioe) {
+    		// OpenJDK throws exceptions on close
+    	}
       }
     }
   }
