@@ -154,15 +154,11 @@ public class DeadlockTest {
       final FeedEntity feedEntity = entity.build();
 
       while (!Thread.interrupted()) {
-    	try {
-          GtfsRealtimeIncrementalUpdate update = new GtfsRealtimeIncrementalUpdate();
-          update.addUpdatedEntity(feedEntity);
-          _sink.handleIncrementalUpdate(update);
-    	} catch (Exception ioe) {
-    		// OpenJDK throws exceptions on close
-    	}
+        GtfsRealtimeIncrementalUpdate update = new GtfsRealtimeIncrementalUpdate();
+        update.addUpdatedEntity(feedEntity);
+        _sink.handleIncrementalUpdate(update);
       }
-      _log.info("source exiting");
+      _log.info("DataSource EXITING");
     }
   }
 
