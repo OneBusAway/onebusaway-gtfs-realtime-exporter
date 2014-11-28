@@ -132,22 +132,11 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     public void onOpen(Session session) {
       _log.info("client connect");
       _session = session;
-      // When we add ourselves as an incremental listener to the
-      // GtfsRealtimeSource, it typically triggers a "handleFeed" update
-      // immediately. Thus, we don't want to call this until we've released the
-      // _session lock, otherwise we'll get a deadlock in the handleFeed()
-      // method.
-      _log.info("pre add lock");
       _source.addIncrementalListener(this);
-      _log.info("post add lock");;
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int closeCode, String message) {
-    	if (session == null) {
-    		_log.error("onClose called with null session, ignorning");
-    		return;
-    	}
         _session = null;
       _source.removeIncrementalListener(this);
     }
@@ -173,7 +162,6 @@ public class GtfsRealtimeServlet extends WebSocketServlet implements
     private synchronized void sendMessage(byte[] buffer) {
     	Session session = _session;  // copy handle to remove synch issues
       if (session == null || !session.isOpen()) {
-    	  _log.error("no session for sendMessage");
         return;
       }
       try {

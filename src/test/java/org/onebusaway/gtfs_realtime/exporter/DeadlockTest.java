@@ -17,7 +17,6 @@ package org.onebusaway.gtfs_realtime.exporter;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -118,7 +117,7 @@ public class DeadlockTest {
 
   private static URL getUrl() {
     try {
-      String port = System.getProperty("org_onebusaway_test_port", "8182");
+      String port = System.getProperty("org_onebusaway_test_port", "8080");
       return new URL("http://localhost:" + port + "/my-servlet");
     } catch (MalformedURLException ex) {
       throw new IllegalStateException(ex);
@@ -127,7 +126,7 @@ public class DeadlockTest {
 
   private static URI getWebsocketUri() {
     try {
-      String port = System.getProperty("org_onebusaway_test_port", "8182");
+      String port = System.getProperty("org_onebusaway_test_port", "8080");
       return new URI("ws://localhost:" + port + "/my-servlet");
     } catch (URISyntaxException ex) {
       throw new IllegalStateException(ex);
@@ -158,7 +157,6 @@ public class DeadlockTest {
         update.addUpdatedEntity(feedEntity);
         _sink.handleIncrementalUpdate(update);
       }
-      _log.info("DataSource EXITING");
     }
   }
 
