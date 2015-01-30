@@ -13,7 +13,7 @@
   <url>https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/wiki/</url>
 
   <properties>
-    <gtfs_realtime_api_version>1.1.2-SNAPSHOT</gtfs_realtime_api_version>
+    <gtfs_realtime_api_version>1.2.0</gtfs_realtime_api_version>
     <onebusaway_guice_jsr250_version>1.0.2</onebusaway_guice_jsr250_version>
     <jetty.version>9.0.5.v20130815</jetty.version>
     <!-- These properties are primarily used in configuring joint integration tests -->
