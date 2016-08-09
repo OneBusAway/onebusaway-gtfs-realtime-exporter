@@ -19,7 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.inject.name.Named;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.AlertsExporter;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.MixedFeedExporter;
 import org.onebusaway.gtfs_realtime.exporter.GtfsRealtimeExporter.TripUpdatesExporter;
@@ -33,6 +36,8 @@ import com.google.transit.realtime.GtfsRealtimeConstants;
 import com.google.transit.realtime.GtfsRealtimeOneBusAway;
 import com.google.transit.realtime.GtfsRealtimeOneBusAway.OneBusAwayFeedHeader;
 
+import javax.inject.Inject;
+
 /**
  * Private implementation of {@link GtfsRealtimeExporter}.
  * 
@@ -45,13 +50,33 @@ class GtfsRealtimeExporterImpl implements AlertsExporter, TripUpdatesExporter,
 
   private FeedHeader _header;
 
-  private Map<String, FeedEntity> _feedEntities = new HashMap<String, FeedEntity>();
+  private Map<String, FeedEntity> _feedEntities;
 
   private FeedMessage _cachedFeed = null;
 
   private long _incrementalIndex = 1;
 
   private int _incrementalHeartbeatInterval = 60;
+
+  @Inject
+  GtfsRealtimeExporterImpl(@Named("cache.expire.secs") String cacheExpireSecs) {
+    this(Integer.parseInt(cacheExpireSecs));
+  }
+
+  GtfsRealtimeExporterImpl() {
+    this(0);
+  }
+
+  GtfsRealtimeExporterImpl(int cacheExpireSecs) {
+    if (cacheExpireSecs > 0) {
+      _feedEntities = CacheBuilder.newBuilder()
+              .expireAfterWrite(cacheExpireSecs, TimeUnit.SECONDS)
+              .<String, FeedEntity>build().asMap();
+    }
+    else {
+      _feedEntities = new HashMap<String, FeedEntity>();
+    }
+  }
 
   /****
    * {@link GtfsRealtimeSink} Interface
