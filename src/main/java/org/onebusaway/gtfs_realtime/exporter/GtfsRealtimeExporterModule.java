@@ -15,6 +15,7 @@
  */
 package org.onebusaway.gtfs_realtime.exporter;
 
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -109,6 +110,9 @@ public class GtfsRealtimeExporterModule extends AbstractModule {
     bind(ScheduledExecutorService.class).annotatedWith(
         Names.named(NAME_EXECUTOR)).toInstance(
         Executors.newSingleThreadScheduledExecutor());
+
+    String expire = System.getProperty("cache.expire.secs", "0");
+    bindConstant().annotatedWith(Names.named("cache.expire.secs")).to(expire);
   }
 
   /**
