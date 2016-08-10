@@ -4,7 +4,7 @@
   <parent>
     <artifactId>onebusaway</artifactId>
     <groupId>org.onebusaway</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.2</version>
   </parent>
   <artifactId>onebusaway-gtfs-realtime-exporter</artifactId>
   <version>1.2.0-SNAPSHOT</version>
