@@ -6,7 +6,7 @@
     <version>1.2.2</version>
   </parent>
   <artifactId>onebusaway-gtfs-realtime-exporter</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2-SNAPSHOT</version>
   <name>onebusaway-gtfs-realtime-exporter</name>
   <description>Support library for creating an application that shares GTFS-realtime data.</description>
   <url>https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/wiki/</url>
