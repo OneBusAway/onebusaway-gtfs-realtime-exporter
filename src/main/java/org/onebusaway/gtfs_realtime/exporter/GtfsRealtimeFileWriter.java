@@ -96,8 +96,12 @@ public class GtfsRealtimeFileWriter {
 
   protected void writeMessageToFile() throws IOException {
     Message message = _source.getFeed();
-    OutputStream out = new BufferedOutputStream(new FileOutputStream(_path));
+    File temp = File.createTempFile(_path.getName(), ".tmp");
+    OutputStream out = new BufferedOutputStream(new FileOutputStream(temp));
     message.writeTo(out);
+    if (!temp.renameTo(_path)){
+    	throw new IOException("Failed to move temporary file");
+    }
     out.close();
   }
 
