@@ -3,7 +3,7 @@
   <parent>
     <artifactId>onebusaway</artifactId>
     <groupId>org.onebusaway</groupId>
-    <version>1.2.2</version>
+    <version>1.2.6</version>
   </parent>
   <artifactId>onebusaway-gtfs-realtime-exporter</artifactId>
   <version>1.2.2-SNAPSHOT</version>
@@ -12,7 +12,7 @@
   <url>https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter/wiki/</url>
 
   <properties>
-    <gtfs_realtime_api_version>1.2.4</gtfs_realtime_api_version>
+    <gtfs_realtime_api_version>1.2.21</gtfs_realtime_api_version>
     <onebusaway_guice_jsr250_version>1.0.2</onebusaway_guice_jsr250_version>
     <jetty.version>9.0.5.v20130815</jetty.version>
     <!-- These properties are primarily used in configuring joint integration tests -->
@@ -21,8 +21,28 @@
 
   <repositories>
     <repository>
-      <id>public.onebusaway.org</id>
-      <url>http://nexus.onebusaway.org/content/groups/public/</url>
+      <id>repo.camsys-apps.com</id>
+      <url>https://repo.camsys-apps.com/third-party/</url>
+    </repository>
+    <repository>
+      <id>releases-camsys-public-repo</id>
+      <url>https://repo.camsys-apps.com/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>snapshots-camsys-public-repo</id>
+      <url>https://repo.camsys-apps.com/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
