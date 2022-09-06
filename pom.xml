@@ -100,12 +100,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.onebusaway</groupId>
       <artifactId>onebusaway-guice-jsr250</artifactId>
       <version>${onebusaway_guice_jsr250_version}</version>
